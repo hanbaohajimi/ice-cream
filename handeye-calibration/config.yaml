@@ -1,0 +1,84 @@
+# =============================================================================
+# handeye-calibration / config.yaml
+# 手眼标定工具统一配置文件
+#
+# 用法：直接修改此文件，无需传 CLI 参数即可运行各脚本。
+#       CLI 参数仍可覆盖此文件中的值（优先级：CLI > config.yaml）。
+# =============================================================================
+
+# ── 手眼标定计算 (eyeInHand.py) ───────────────────────────────────────────────
+calibration:
+
+  # 标定板图片目录（相对于本 config.yaml 所在目录）
+  # 来源：eyeInHand.py __main__ images_path（原值 "./images"）
+  images_dir: "images"
+
+  # 机械臂末端位姿文件路径（相对于 images_dir，每行: x,y,z,Rx,Ry,Rz，单位 m/rad）
+  # 图片与位姿行数须一一对应
+  # 来源：eyeInHand.py __main__ file_path（原值 "./images/poses.txt"）
+  poses_file: "images/poses.txt"
+
+  # 中间 CSV 文件名（自动生成，无需手动设置；与 images_dir 同级）
+  # 来源：eyeInHand.py line 68 / 124，原值 "./robotToolPose.csv"
+  robot_tool_pose_csv: "robotToolPose.csv"
+
+  # 棋盘格长边内角点数量（注意是"内角点"，不含边缘）
+  # 来源：eyeInHand.py __main__ corner_point_long（原值 11）
+  board_corners_long: 11
+
+  # 棋盘格短边内角点数量
+  # 来源：eyeInHand.py __main__ corner_point_short（原值 8）
+  board_corners_short: 8
+
+  # 棋盘格单格真实尺寸（单位：米）
+  # 来源：eyeInHand.py __main__ corner_point_size（原值 0.015）
+  board_square_size_m: 0.015
+
+  # 亚像素角点搜索最大迭代次数
+  # 来源：eyeInHand.py line 77 criteria 第二项（原值 30）
+  subpix_max_iter: 30
+
+  # 亚像素角点搜索收敛精度（像素）
+  # 来源：eyeInHand.py line 77 criteria 第三项（原值 0.001）
+  subpix_epsilon: 0.001
+
+  # 图片编号扫描上限（扫描 0.jpg … max_images-1.jpg）
+  # 来源：eyeInHand.py line 88 range(0, 30)（原值 30）
+  max_images: 30
+
+
+# ── 在线采集 (online_capture.py) ─────────────────────────────────────────────
+capture:
+
+  # 输出目录（存放 N.jpg、poses.txt、capture_meta.jsonl）
+  # 相对于本 config.yaml 所在目录
+  # 来源：online_capture.py parse_args --images-dir（原值 script_dir/"images"）
+  images_dir: "images"
+
+  # 机械臂 WebSocket 主机 IP
+  # 来源：online_capture.py parse_args --ws-host（原值 "192.168.31.142"）
+  ws_host: "192.168.31.142"
+
+  # 机械臂 WebSocket 端口
+  # 来源：online_capture.py parse_args --ws-port（原值 8765）
+  ws_port: 8765
+
+  # 相机 RGB 压缩图像 ROS Topic（默认使用压缩格式）
+  # 来源：online_capture.py line 44 DEFAULT_RGB_COMPRESSED_TOPIC
+  rgb_compressed_topic: "/ascamera_hp60c/camera_publisher/rgb0/image/compressed"
+
+  # 相机 RGB 原始图像 ROS Topic（传入 --raw-image 时使用）
+  # 来源：online_capture.py line 45 DEFAULT_RGB_RAW_TOPIC
+  rgb_raw_topic: "/ascamera_hp60c/camera_publisher/rgb0/image"
+
+  # 图像帧最大允许延迟（秒），超过则拒绝本次采集
+  # 来源：online_capture.py parse_args --max-image-age-s（原值 0.5）
+  max_image_age_s: 0.5
+
+  # 位姿最大允许延迟（秒），超过则拒绝本次采集
+  # 来源：online_capture.py parse_args --max-pose-age-s（原值 0.5）
+  max_pose_age_s: 0.5
+
+  # 图像与位姿时间戳最大允许偏差（秒），防止时间不同步导致错配
+  # 来源：online_capture.py parse_args --max-skew-s（原值 0.25）
+  max_skew_s: 0.25

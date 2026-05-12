@@ -1,0 +1,120 @@
+# =============================================================================
+# yolo-pose-pipeline / config.yaml
+# YOLO 姿态检测训练流水线统一配置文件
+#
+# 用法：直接修改此文件，无需传 CLI 参数即可运行各脚本。
+#       CLI 参数仍可覆盖此文件中的值（优先级：CLI > config.yaml）。
+# =============================================================================
+
+# ── 视频抽帧 (extract_frames.py) ─────────────────────────────────────────────
+extract_frames:
+
+  # 输入视频目录（相对于本 config.yaml 所在目录）
+  # 来源：extract_frames.py default_input（原为绝对路径 /home/ubuntu22/桌面/...，已改为相对路径）
+  input_dir: "data_video"
+
+  # 输出帧目录（每个视频单独生成子文件夹）
+  # 来源：extract_frames.py default_output（原值 script_dir/"data_video_frames"）
+  output_dir: "data_video_frames"
+
+  # 目标抽帧率（帧/秒），2.0 表示每秒保存 2 张
+  # 来源：extract_frames.py --fps（原值 2.0）
+  fps: 2.0
+
+  # 输出图片扩展名（.jpg 或 .png）
+  # 来源：extract_frames.py --ext（原值 ".jpg"）
+  ext: ".jpg"
+
+
+# ── 数据集准备 (pose/prepare_data.py) ────────────────────────────────────────
+prepare_data:
+
+  # 源数据集根目录（含 images/ 和 labels/ 子目录，或 images/ 下有 LabelMe JSON）
+  # 来源：prepare_data.py --src（原值 SCRIPT_DIR/"dataset2"）
+  src_dir: "pose/dataset"
+
+  # 输出 YOLO 格式数据集根目录（train/val/test 分割结果写入此处）
+  # 来源：prepare_data.py --dst（原值 SCRIPT_DIR/"yolo_dataset"）
+  dst_dir: "pose/yolo_dataset"
+
+  # 类别定义文件（pose_classes.yaml，定义各类别的关键点名称与顺序）
+  # 来源：prepare_data.py POSE_CLASS_FILE（原值 SCRIPT_DIR/"dataset417/pose_classes.yaml"）
+  pose_classes_file: "pose/dataset/pose_classes.yaml"
+
+  # 每个目标最大关键点数量，不足时补 0（不可见）
+  # 来源：prepare_data.py line 12 MAX_KPTS（原值 4）
+  max_keypoints: 4
+
+  # 训练集比例（0~1）
+  # 来源：prepare_data.py train_ratio（原值 0.8）
+  train_ratio: 0.8
+
+  # 验证集比例（0~1），剩余部分自动作为测试集
+  # 来源：prepare_data.py val_ratio（原值 0.1）
+  val_ratio: 0.1
+
+  # 随机种子，保证每次划分结果可复现
+  # 来源：prepare_data.py seed（原值 42）
+  seed: 42
+
+  # 运行模式：
+  #   convert    - LabelMe JSON → YOLO txt，然后做 train/val/test 分割（默认）
+  #   split-only - 跳过 JSON 转换，直接对已有 YOLO txt 做分割（原 split_only.py 功能）
+  # 来源：split_only.py 已合并至此脚本
+  mode: "convert"
+
+
+# ── 模型训练 (pose/train.py) ──────────────────────────────────────────────────
+train:
+
+  # Ultralytics 预训练基础权重文件名（首次运行自动下载）
+  # 来源：train.py line 12（原值 "yolo11n-pose.pt"）
+  pretrained_weights: "yolo11n-pose.pt"
+
+  # 数据集配置文件路径（相对于本 config.yaml 所在目录）
+  # 来源：train.py data=ROOT/"data.yaml"
+  data_yaml: "pose/data.yaml"
+
+  # 训练轮数
+  # 来源：train.py epochs（原值 100）
+  epochs: 100
+
+  # 输入图像尺寸（像素，正方形裁剪）
+  # 来源：train.py imgsz（原值 640）
+  imgsz: 640
+
+  # 训练 batch 大小（显存不足时调小）
+  # 来源：train.py batch（原值 4）
+  batch: 4
+
+  # 实验名称，训练结果保存在 runs_dir/<run_name>/
+  # 来源：train.py name（原值 "triangle_pose"）
+  run_name: "pose_training"
+
+  # 训练输出根目录（相对于本 config.yaml 所在目录）
+  # 来源：train.py project=ROOT/"runs"
+  runs_dir: "pose/runs"
+
+
+# ── 实时推理 (pose/realtime_detect_pose.py) ───────────────────────────────────
+inference:
+
+  # 训练好的模型权重路径（相对于本 config.yaml 所在目录）
+  # 来源：realtime_detect_pose.py --weights（原为 required 参数，现有默认值）
+  weights_path: "pose/runs/pose_training/weights/best.pt"
+
+  # 摄像头设备索引（0 = 第一个摄像头）
+  # 来源：realtime_detect_pose.py --source（原值 0）
+  camera_source: 0
+
+  # 推理图像尺寸（像素）
+  # 来源：realtime_detect_pose.py --imgsz（原值 640）
+  imgsz: 640
+
+  # 检测置信度阈值（低于此值的检测被忽略）
+  # 来源：realtime_detect_pose.py --conf（原值 0.25）
+  conf_threshold: 0.25
+
+  # 推理设备（空字符串=自动选择 GPU/CPU；"cpu"；"0" 或 "0,1" 指定 GPU）
+  # 来源：realtime_detect_pose.py --device（原值 ""）
+  device: ""

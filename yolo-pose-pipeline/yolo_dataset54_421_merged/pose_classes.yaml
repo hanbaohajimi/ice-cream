@@ -1,0 +1,18 @@
+has_visible: true
+classes:
+  Triangle:
+    - apex
+    - base_left
+    - base_right
+  Circle:
+    - center
+  Trapezium:
+    - short_base_left
+    - short_base_right
+    - long_base_right
+    - long_base_left
+  Square:
+    - front_left
+    - front_right
+    - back_right
+    - back_left

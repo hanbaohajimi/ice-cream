@@ -1,0 +1,17 @@
+path: /home/ubuntu22/yolo_ros/yolo_obb_pose/pose/yolo_dataset54_421_merged
+train: images/train
+val: images/val
+test: images/test
+kpt_shape:
+- 4
+- 3
+flip_idx:
+- 0
+- 1
+- 2
+- 3
+names:
+  0: Triangle
+  1: Circle
+  2: Trapezium
+  3: Square

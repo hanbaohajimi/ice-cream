@@ -1,0 +1,236 @@
+# =============================================================================
+# robot-vision-ros2 / config.yaml
+# ROS2 机器人视觉节点统一配置文件
+#
+# 用法：
+#   - ROS2 launch 文件会读取此文件作为各参数默认值
+#   - CLI 参数 / ros2 launch 命令行参数仍可覆盖（优先级：CLI > config.yaml）
+#   - 更换标定结果：只需修改 hand_eye.T_cam2ee 矩阵，无需改代码
+# =============================================================================
+
+# ── 手眼外参（cam_hand_eye.py）────────────────────────────────────────────────
+hand_eye:
+
+  # 相机坐标系 → 末端执行器坐标系的齐次变换矩阵 T_cam2ee（4×4，行优先）
+  # 变换链：p_base = T_ee2base @ T_cam2ee @ p_cam
+  # 其中 T_ee2base 来自机械臂 link5_hmat（WebSocket 实时反馈）
+  #
+  # 来源：cam_hand_eye.py T_CAM2EE（Park 方法标定结果，原为硬编码常量）
+  # 更换标定时：将 eyeInHand.py 的 PARK 方法输出的旋转矩阵和平移向量填入此处
+  T_cam2ee:
+    - [-0.05458395, -0.98267662, -0.177108,   0.05646747]
+    - [ 0.99841646, -0.05613061,  0.00373064, 0.00237631]
+    - [-0.01360719, -0.17662391,  0.98418435, 0.01534744]
+    - [ 0.0,         0.0,         0.0,         1.0       ]
+
+
+# ── 相机话题（HP60C 专用，yolo_center_depth_hp60c.launch.py）────────────────
+camera:
+
+  # RGB 压缩图像话题
+  # 来源：yolo_center_depth_hp60c.launch.py _HP60C_RGB（原值 "/ascamera_hp60c/..."）
+  rgb_topic: "/ascamera_hp60c/camera_publisher/rgb0/image/compressed"
+
+  # 深度压缩图像话题
+  # 来源：yolo_center_depth_hp60c.launch.py _HP60C_DEPTH
+  depth_topic: "/ascamera_hp60c/camera_publisher/depth0/image_raw/compressedDepth"
+
+  # 相机内参话题
+  # 来源：yolo_center_depth_hp60c.launch.py _HP60C_INFO
+  camera_info_topic: "/ascamera_hp60c/camera_publisher/rgb0/camera_info"
+
+  # 是否使用压缩 RGB（节省带宽）；false = 使用 sensor_msgs/Image
+  # 来源：detection_node.py use_compressed（原值 True）
+  use_compressed: true
+
+  # 是否使用压缩深度；false = 使用 sensor_msgs/Image
+  # 来源：depth_node.py use_compressed_depth（原值 True）
+  use_compressed_depth: true
+
+
+# ── 模型路径（detection_node.py / launch）────────────────────────────────────
+model:
+
+  # YOLO 权重文件路径（相对于本 config.yaml 所在目录，或绝对路径）
+  # 来源：yolo_center_depth_hp60c.launch.py weights_path（原绝对路径 /home/ubuntu22/...）
+  weights_path: "/home/ubuntu22/robot_projects/yolo-pose-pipeline/pose/runs/dataset54/weights/best.pt"
+
+  # 关键点类别定义文件（pose_classes.yaml）
+  # 来源：yolo_center_depth_hp60c.launch.py pose_classes_path（原绝对路径 /home/ubuntu22/...）
+  pose_classes_path: "/home/ubuntu22/robot_projects/yolo-pose-pipeline/yolo_dataset54_421_merged/pose_classes.yaml"
+
+  # 推理设备（"cuda:0" / "cpu"）
+  # 来源：detection_node.py device（原值 "cuda:0"）
+  device: "cuda:0"
+
+  # 是否使用 FP16 半精度推理（仅 CUDA 有效，加速约 2x）
+  # 来源：detection_node.py use_half（原值 True）
+  use_half: true
+
+  # 推理图像尺寸（像素）
+  # 来源：detection_node.py imgsz（原值 640）
+  imgsz: 640
+
+
+# ── 检测参数（detection_node.py）─────────────────────────────────────────────
+detection:
+
+  # 检测置信度阈值，低于此值的检测结果被丢弃
+  # 来源：detection_node.py conf_threshold（原值 0.25）
+  conf_threshold: 0.25
+
+  # 最大检测数量（NMS 前）
+  # 来源：detection_node.py max_det（原值 50）
+  max_det: 50
+
+  # 连续稳定帧数，达到后才开始发布检测结果（防抖）
+  # 来源：detection_node.py min_stable_frames（原值 2）
+  min_stable_frames: 2
+
+  # 角度 EMA 平滑系数（0~1，越小越平滑，越大跟随越快）
+  # 来源：detection_node.py ema_alpha（原值 0.4）
+  ema_alpha: 0.4
+
+  # 无关键点时是否回退到 bbox 中心作为检测中心
+  # 来源：detection_node.py use_bbox_center_if_no_pose（原值 True）
+  use_bbox_center_if_no_pose: true
+
+  # 用作中心点的关键点索引（0-based，仅 detect 模式有效）
+  # 来源：detection_node.py center_keypoint_index（原值 0）
+  center_keypoint_index: 0
+
+  # 是否逐帧打印检测 INFO 日志
+  # 来源：detection_node.py log_detections（原值 False；hp60c launch 默认 true）
+  log_detections: true
+
+  # "无检测"日志节流间隔（秒）
+  # 来源：detection_node.py log_empty_throttle_sec（原值 2.0）
+  log_empty_throttle_sec: 2.0
+
+
+# ── 深度节点参数（depth_node.py）──────────────────────────────────────────────
+depth:
+
+  # 深度图与 RGB 检测结果的时间戳同步窗口（秒）
+  # 来源：depth_node.py sync_slop_sec（HP60C 默认 0.12，通用默认 0.08）
+  sync_slop_sec: 0.12
+
+  # 中位深度采样半径（像素），在目标中心周围 radius×radius 区域取中位值
+  # 来源：depth_node.py sample_radius（HP60C 默认 8，通用默认 2）
+  sample_radius: 8
+
+  # 深度图是否已对齐到 RGB 坐标系
+  # 来源：depth_node.py depth_aligned_to_rgb（原值 True）
+  depth_aligned_to_rgb: true
+
+  # 有效深度最小值（米），小于此值视为噪声
+  # 来源：depth_node.py min_depth_m（原值 0.05）
+  min_depth_m: 0.05
+
+  # 有效深度最大值（米），大于此值视为超范围
+  # 来源：depth_node.py max_depth_m（原值 4.0）
+  max_depth_m: 4.0
+
+
+# ── 可视化节点参数（visualization_node.py）───────────────────────────────────
+visualization:
+
+  # 是否显示 OpenCV imshow 窗口
+  # 来源：visualization_node.py show_window（原值 True）
+  show_window: true
+
+  # 是否将叠加图像发布到 ROS 话题
+  # 来源：visualization_node.py publish_image（原值 True）
+  publish_image: true
+
+  # 显示/发布图像的缩放比例（1.0 = 原始分辨率，0.5 = 减半，节省 CPU）
+  # 来源：visualization_node.py display_scale（原值 1.0）
+  display_scale: 1.0
+
+  # 每隔 N 帧绘制一次叠加（1 = 每帧；2 = 隔帧，减半 CPU 占用）
+  # 来源：visualization_node.py rgb_process_stride（原值 1）
+  rgb_process_stride: 1
+
+  # OpenCV 线程数（建议与核数匹配，过多反而降速）
+  # 来源：visualization_node.py opencv_num_threads（原值 2）
+  opencv_num_threads: 2
+
+  # 是否绘制关键点骨架
+  # 来源：visualization_node.py show_keypoints（原值 True）
+  show_keypoints: true
+
+  # 关键点置信度阈值，低于此值的关键点不绘制
+  # 来源：visualization_node.py keypoint_conf_threshold（原值 0.3）
+  keypoint_conf_threshold: 0.3
+
+  # 超过此时间（秒）无新检测结果则隐藏叠加框（防止显示过期数据）
+  # 来源：visualization_node.py det_stale_timeout_sec（原值 1.0）
+  det_stale_timeout_sec: 1.0
+
+
+# ── 抓取节点参数（grasp_node.py）──────────────────────────────────────────────
+grasp:
+
+  # 位置 EMA 平滑系数（0~1，越小越稳定）
+  # 来源：grasp_node.py pos_ema_alpha（原值 0.35）
+  pos_ema_alpha: 0.35
+
+  # 最低检测置信度，低于此值不生成抓取目标
+  # 来源：grasp_node.py min_score（原值 0.25）
+  min_score: 0.25
+
+  # 预抓取悬停偏移量（米，沿 -Z 方向）
+  # 来源：grasp_node.py approach_offset_m（原值 0.05）
+  approach_offset_m: 0.05
+
+  # TF 坐标系（空字符串 = 使用相机坐标系，不做 TF 变换）
+  # 来源：grasp_node.py target_frame（原值 ""）
+  target_frame: ""
+
+
+# ── 网络地址（base_logger_node.py / head_ingestion.yaml）──────────────────────
+network:
+
+  # 机械臂 WebSocket 主机 IP
+  # 来源：head_ingestion.yaml ws_host 和 base_logger_node.py ws_host（原值 "192.168.31.142"）
+  ws_host: "192.168.31.142"
+
+  # 机械臂 WebSocket 端口
+  # 来源：head_ingestion.yaml ws_port（原值 8765）
+  ws_port: 8765
+
+  # Head 设备 HTTP 数据上报 URL（格式 host:port，空字符串则不上报）
+  # 来源：head_ingestion.yaml head_http_url（原值 "192.168.31.71:8776"）
+  head_http_url: "192.168.31.71:8776"
+
+  # HTTP 请求超时（秒）
+  # 来源：base_logger_node.py head_http_timeout_sec（原值 0.25）
+  head_http_timeout_sec: 0.25
+
+
+# ── 目标记录节点参数（base_logger_node.py）────────────────────────────────────
+logger:
+
+  # 仅记录此类别的目标（空字符串 = 记录全部类别）
+  # 来源：base_logger_node.py target_class（原值 ""）
+  target_class: ""
+
+  # 两次检测日志条目之间的最小间隔（秒），防止日志刷屏
+  # 来源：base_logger_node.py log_detection_min_interval_sec（原值 1.0）
+  log_detection_min_interval_sec: 1.0
+
+  # true = 每帧只记录置信度最高的一个检测结果
+  # 来源：base_logger_node.py log_best_detection_only（原值 False）
+  log_best_detection_only: false
+
+  # 是否启用 HTTP 上报到 Head 设备
+  # 来源：base_logger_node.py head_ingestion_enabled（原值 False）
+  head_ingestion_enabled: false
+
+  # 上报时附带的语义角色标签
+  # 来源：base_logger_node.py head_role（原值 "object"）
+  head_role: "object"
+
+  # 上报类别名称时添加的前缀（如 "robot_" → "robot_Triangle"）
+  # 来源：base_logger_node.py head_label_prefix（原值 ""）
+  head_label_prefix: ""

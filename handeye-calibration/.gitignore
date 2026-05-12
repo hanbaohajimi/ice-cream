@@ -1,0 +1,20 @@
+# 标定采集图片（建议存外部存储，不入库）
+images/
+images(first)/
+images(second)/
+eg_images/
+
+# 中间产物
+robotToolPose.csv
+result.txt
+
+# Python 缓存
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# 系统文件
+.DS_Store
+~$*
+.~lock.*

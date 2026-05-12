@@ -1,0 +1,17 @@
+# ROS2 编译产物（colcon build 生成，可随时重建）
+build/
+install/
+log/
+
+# Python 缓存
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# OpenCV / C 扩展缓存
+.cache/
+
+# 系统文件
+.DS_Store
+~$*
