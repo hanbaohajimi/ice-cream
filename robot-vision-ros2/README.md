@@ -37,8 +37,8 @@ hand_eye:
     - [...]
 
 model:
-  weights_path: "../yolo-pose-pipeline/pose/runs/pose_training/weights/best.pt"
-  pose_classes_path: "../yolo-pose-pipeline/pose/dataset/pose_classes.yaml"
+  weights_path: "/home/ubuntu22/robot_projects/yolo-pose-pipeline/pose/runs/dataset54/weights/best.pt"
+  pose_classes_path: "/home/ubuntu22/robot_projects/yolo-pose-pipeline/yolo_dataset54_421_merged/pose_classes.yaml"
 
 network:
   ws_host: "192.168.31.142"   # 机械臂 IP

@@ -1,6 +1,5 @@
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
-from launch.conditions import IfCondition
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 from launch_ros.parameter_descriptions import ParameterValue
@@ -16,7 +15,6 @@ def generate_launch_description() -> LaunchDescription:
     camera_info_topic = LaunchConfiguration("camera_info_topic")
     weights_path      = LaunchConfiguration("weights_path")
     pose_classes_path = LaunchConfiguration("pose_classes_path")
-    enable_viz        = LaunchConfiguration("enable_viz")
     sample_radius     = LaunchConfiguration("sample_radius")
     sync_slop_sec     = LaunchConfiguration("sync_slop_sec")
     conf_threshold    = LaunchConfiguration("conf_threshold")
@@ -31,11 +29,6 @@ def generate_launch_description() -> LaunchDescription:
     max_det              = LaunchConfiguration("max_det")
     log_detections          = LaunchConfiguration("log_detections")
     log_empty_throttle_sec  = LaunchConfiguration("log_empty_throttle_sec")
-    viz_display_scale    = LaunchConfiguration("viz_display_scale")
-    viz_rgb_stride       = LaunchConfiguration("viz_rgb_stride")
-    viz_opencv_threads   = LaunchConfiguration("viz_opencv_threads")
-    viz_publish_image    = LaunchConfiguration("viz_publish_image")
-    viz_show_window      = LaunchConfiguration("viz_show_window")
     return LaunchDescription([
         # ── 话题参数 ──────────────────────────────────────────────────────────
         DeclareLaunchArgument(
@@ -71,10 +64,6 @@ def generate_launch_description() -> LaunchDescription:
         DeclareLaunchArgument(
             "pose_classes_path", default_value="",
             description="可选的 pose_classes.yaml 路径，用于语义关键点角色映射",
-        ),
-        DeclareLaunchArgument(
-            "enable_viz", default_value="true",
-            description="是否启动叠加可视化节点",
         ),
         DeclareLaunchArgument(
             "conf_threshold", default_value="0.25",
@@ -125,26 +114,6 @@ def generate_launch_description() -> LaunchDescription:
             "log_empty_throttle_sec", default_value="2.0",
             description="'Detection: None' 日志的最小间隔秒数（场景为空时）",
         ),
-        DeclareLaunchArgument(
-            "viz_display_scale", default_value="1.0",
-            description="可视化缩放比例（<1 降低 imshow/发布开销，如 0.5）",
-        ),
-        DeclareLaunchArgument(
-            "viz_rgb_stride", default_value="1",
-            description="可视化每 N 帧解码一次（2 = 可视化 CPU 减半；检测不受影响）",
-        ),
-        DeclareLaunchArgument(
-            "viz_opencv_threads", default_value="2",
-            description="cv2.setNumThreads — 避免与 PyTorch 过度争抢资源",
-        ),
-        DeclareLaunchArgument(
-            "viz_publish_image", default_value="true",
-            description="发布 /object_overlay/image（较大的 bgr8）；设为 false 可节省 DDS CPU",
-        ),
-        DeclareLaunchArgument(
-            "viz_show_window", default_value="true",
-            description="显示 OpenCV 叠加窗口；GUI 模式下传 false 并使用 /object_overlay/image",
-        ),
         # ── 节点 ──────────────────────────────────────────────────────────────
         Node(
             package="center_depth_pipeline",
@@ -182,24 +151,6 @@ def generate_launch_description() -> LaunchDescription:
                 "depth_aligned_to_rgb":     True,
                 "min_depth_m":              min_depth_m,
                 "max_depth_m":              max_depth_m,
-            }],
-            output="screen",
-        ),
-        Node(
-            package="center_depth_pipeline",
-            executable="visualization_node",
-            name="center_depth_overlay_node",
-            condition=IfCondition(enable_viz),
-            parameters=[{
-                "rgb_topic":            rgb_topic,
-                "use_compressed":       use_compressed,
-                "centers_3d_topic":     "/object_centers_3d",
-                "viz_image_topic":      "/object_overlay/image",
-                "show_window":          ParameterValue(viz_show_window, value_type=bool),
-                "publish_image":        ParameterValue(viz_publish_image, value_type=bool),
-                "display_scale":        ParameterValue(viz_display_scale, value_type=float),
-                "rgb_process_stride":   ParameterValue(viz_rgb_stride, value_type=int),
-                "opencv_num_threads":   ParameterValue(viz_opencv_threads, value_type=int),
             }],
             output="screen",
         ),

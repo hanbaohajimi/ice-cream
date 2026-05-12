@@ -63,7 +63,6 @@ def generate_launch_description() -> LaunchDescription:
     # ── declare all forwarded arguments ───────────────────────────────────────
     weights_path         = LaunchConfiguration("weights_path")
     pose_classes_path    = LaunchConfiguration("pose_classes_path")
-    enable_viz           = LaunchConfiguration("enable_viz")
     sample_radius        = LaunchConfiguration("sample_radius")
     sync_slop_sec        = LaunchConfiguration("sync_slop_sec")
     conf_threshold       = LaunchConfiguration("conf_threshold")
@@ -78,11 +77,6 @@ def generate_launch_description() -> LaunchDescription:
     max_det              = LaunchConfiguration("max_det")
     log_detections          = LaunchConfiguration("log_detections")
     log_empty_throttle_sec  = LaunchConfiguration("log_empty_throttle_sec")
-    viz_display_scale    = LaunchConfiguration("viz_display_scale")
-    viz_rgb_stride       = LaunchConfiguration("viz_rgb_stride")
-    viz_opencv_threads   = LaunchConfiguration("viz_opencv_threads")
-    viz_publish_image    = LaunchConfiguration("viz_publish_image")
-    viz_show_window      = LaunchConfiguration("viz_show_window")
     _HP60C_RGB   = "/ascamera_hp60c/camera_publisher/rgb0/image/compressed"
     _HP60C_DEPTH = "/ascamera_hp60c/camera_publisher/depth0/image_raw/compressedDepth"
     _HP60C_INFO  = "/ascamera_hp60c/camera_publisher/rgb0/camera_info"
@@ -98,7 +92,6 @@ def generate_launch_description() -> LaunchDescription:
             default_value=default_pose_classes,
             description="关键点角色语义定义文件 pose_classes.yaml",
         ),
-        DeclareLaunchArgument("enable_viz",           default_value="true"),
         DeclareLaunchArgument("sample_radius",        default_value="8"),
         DeclareLaunchArgument("sync_slop_sec",        default_value="0.12"),
         DeclareLaunchArgument("conf_threshold",       default_value="0.25"),
@@ -117,11 +110,6 @@ def generate_launch_description() -> LaunchDescription:
         DeclareLaunchArgument("max_det", default_value="50"),
         DeclareLaunchArgument("log_detections", default_value="true"),
         DeclareLaunchArgument("log_empty_throttle_sec", default_value="2.0"),
-        DeclareLaunchArgument("viz_display_scale", default_value="1.0"),
-        DeclareLaunchArgument("viz_rgb_stride", default_value="1"),
-        DeclareLaunchArgument("viz_opencv_threads", default_value="2"),
-        DeclareLaunchArgument("viz_publish_image", default_value="true"),
-        DeclareLaunchArgument("viz_show_window", default_value="true"),
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(main_launch),
             launch_arguments=[
@@ -132,7 +120,6 @@ def generate_launch_description() -> LaunchDescription:
                 ("use_compressed_depth", use_compressed_depth),
                 ("weights_path",         weights_path),
                 ("pose_classes_path",    pose_classes_path),
-                ("enable_viz",           enable_viz),
                 ("sample_radius",        sample_radius),
                 ("sync_slop_sec",        sync_slop_sec),
                 ("conf_threshold",       conf_threshold),
@@ -145,11 +132,6 @@ def generate_launch_description() -> LaunchDescription:
                 ("max_det",              max_det),
                 ("log_detections",          log_detections),
                 ("log_empty_throttle_sec",  log_empty_throttle_sec),
-                ("viz_display_scale",    viz_display_scale),
-                ("viz_rgb_stride",       viz_rgb_stride),
-                ("viz_opencv_threads",   viz_opencv_threads),
-                ("viz_publish_image",    viz_publish_image),
-                ("viz_show_window",      viz_show_window),
             ],
         ),
     ])

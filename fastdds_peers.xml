@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<profiles xmlns="http://www.eprosima.com/XMLSchemas/fastRTPS_Profiles">
+
+    <!-- UDP 传输优化：增大发送/接收缓冲区，减少 Wi-Fi 下的丢包卡顿 -->
+    <!-- transport_descriptors 必须在 participant 之前定义，否则解析器找不到引用 -->
+    <transport_descriptors>
+        <transport_descriptor>
+            <transport_id>udp_optimized</transport_id>
+            <type>UDPv4</type>
+            <!-- 25 MB socket 缓冲区（默认仅 208 KB，严重不足） -->
+            <sendBufferSize>26214400</sendBufferSize>
+            <receiveBufferSize>26214400</receiveBufferSize>
+            <!-- 单个 UDP 报文最大 65 KB，与内核 UDP 上限对齐 -->
+            <maxMessageSize>65500</maxMessageSize>
+        </transport_descriptor>
+    </transport_descriptors>
+
+    <!-- ROS_DOMAIN_ID=42  participant ID 0-5 for both machines -->
+    <participant profile_name="default_shmem_off" is_default_profile="true">
+
+        <rtps>
+            <userTransports>
+                <transport_id>udp_optimized</transport_id>
+            </userTransports>
+            <useBuiltinTransports>false</useBuiltinTransports>
+            <builtin>
+                <discovery_config>
+                    <discoveryProtocol>SIMPLE</discoveryProtocol>
+                    <initialAnnouncements>
+                        <count>5</count>
+                        <period>
+                            <sec>0</sec>
+                            <nanosec>100000000</nanosec>
+                        </period>
+                    </initialAnnouncements>
+                </discovery_config>
+                <initialPeersList>
+                    <locator>
+                        <udpv4>
+                            <address>192.168.31.142</address>
+                            <port>17910</port>
+                        </udpv4>
+                    </locator>
+                    <locator>
+                        <udpv4>
+                            <address>192.168.31.142</address>
+                            <port>17912</port>
+                        </udpv4>
+                    </locator>
+                    <locator>
+                        <udpv4>
+                            <address>192.168.31.142</address>
+                            <port>17914</port>
+                        </udpv4>
+                    </locator>
+                    <locator>
+                        <udpv4>
+                            <address>192.168.31.142</address>
+                            <port>17916</port>
+                        </udpv4>
+                    </locator>
+                    <locator>
+                        <udpv4>
+                            <address>192.168.31.142</address>
+                            <port>17918</port>
+                        </udpv4>
+                    </locator>
+                    <locator>
+                        <udpv4>
+                            <address>192.168.31.142</address>
+                            <port>17920</port>
+                        </udpv4>
+                    </locator>
+                    <locator>
+                        <udpv4>
+                            <address>192.168.31.211</address>
+                            <port>17910</port>
+                        </udpv4>
+                    </locator>
+                    <locator>
+                        <udpv4>
+                            <address>192.168.31.211</address>
+                            <port>17912</port>
+                        </udpv4>
+                    </locator>
+                    <locator>
+                        <udpv4>
+                            <address>192.168.31.211</address>
+                            <port>17914</port>
+                        </udpv4>
+                    </locator>
+                    <locator>
+                        <udpv4>
+                            <address>192.168.31.211</address>
+                            <port>17916</port>
+                        </udpv4>
+                    </locator>
+                    <locator>
+                        <udpv4>
+                            <address>192.168.31.211</address>
+                            <port>17918</port>
+                        </udpv4>
+                    </locator>
+                    <locator>
+                        <udpv4>
+                            <address>192.168.31.211</address>
+                            <port>17920</port>
+                        </udpv4>
+                    </locator>
+                </initialPeersList>
+            </builtin>
+        </rtps>
+    </participant>
+
+</profiles>

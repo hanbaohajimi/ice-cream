@@ -125,67 +125,11 @@ depth:
 
   # 有效深度最小值（米），小于此值视为噪声
   # 来源：depth_node.py min_depth_m（原值 0.05）
-  min_depth_m: 0.05
+  min_depth_m: 0.2
 
   # 有效深度最大值（米），大于此值视为超范围
   # 来源：depth_node.py max_depth_m（原值 4.0）
   max_depth_m: 4.0
-
-
-# ── 可视化节点参数（visualization_node.py）───────────────────────────────────
-visualization:
-
-  # 是否显示 OpenCV imshow 窗口
-  # 来源：visualization_node.py show_window（原值 True）
-  show_window: true
-
-  # 是否将叠加图像发布到 ROS 话题
-  # 来源：visualization_node.py publish_image（原值 True）
-  publish_image: true
-
-  # 显示/发布图像的缩放比例（1.0 = 原始分辨率，0.5 = 减半，节省 CPU）
-  # 来源：visualization_node.py display_scale（原值 1.0）
-  display_scale: 1.0
-
-  # 每隔 N 帧绘制一次叠加（1 = 每帧；2 = 隔帧，减半 CPU 占用）
-  # 来源：visualization_node.py rgb_process_stride（原值 1）
-  rgb_process_stride: 1
-
-  # OpenCV 线程数（建议与核数匹配，过多反而降速）
-  # 来源：visualization_node.py opencv_num_threads（原值 2）
-  opencv_num_threads: 2
-
-  # 是否绘制关键点骨架
-  # 来源：visualization_node.py show_keypoints（原值 True）
-  show_keypoints: true
-
-  # 关键点置信度阈值，低于此值的关键点不绘制
-  # 来源：visualization_node.py keypoint_conf_threshold（原值 0.3）
-  keypoint_conf_threshold: 0.3
-
-  # 超过此时间（秒）无新检测结果则隐藏叠加框（防止显示过期数据）
-  # 来源：visualization_node.py det_stale_timeout_sec（原值 1.0）
-  det_stale_timeout_sec: 1.0
-
-
-# ── 抓取节点参数（grasp_node.py）──────────────────────────────────────────────
-grasp:
-
-  # 位置 EMA 平滑系数（0~1，越小越稳定）
-  # 来源：grasp_node.py pos_ema_alpha（原值 0.35）
-  pos_ema_alpha: 0.35
-
-  # 最低检测置信度，低于此值不生成抓取目标
-  # 来源：grasp_node.py min_score（原值 0.25）
-  min_score: 0.25
-
-  # 预抓取悬停偏移量（米，沿 -Z 方向）
-  # 来源：grasp_node.py approach_offset_m（原值 0.05）
-  approach_offset_m: 0.05
-
-  # TF 坐标系（空字符串 = 使用相机坐标系，不做 TF 变换）
-  # 来源：grasp_node.py target_frame（原值 ""）
-  target_frame: ""
 
 
 # ── 网络地址（base_logger_node.py / head_ingestion.yaml）──────────────────────
