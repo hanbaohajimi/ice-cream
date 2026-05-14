@@ -1,13 +1,18 @@
 """
-object_base_logger 专用 launch。
+完整流水线 launch：detection_node + depth_node + base_logger_node。
 所有参数默认值从仓库根 config.yaml 读取，命令行传参优先级更高。
+
+用法：
+  ros2 launch object_base_logger object_base_logger.launch.py
 """
 
 import os
 from pathlib import Path
 
+from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
+from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 from launch_ros.parameter_descriptions import ParameterValue
@@ -32,18 +37,26 @@ def generate_launch_description() -> LaunchDescription:
     net = cfg.get("network", {})
     log = cfg.get("logger",  {})
 
-    ws_host                      = LaunchConfiguration("ws_host")
-    ws_port                      = LaunchConfiguration("ws_port")
-    target_class                 = LaunchConfiguration("target_class")
+    # ── 相机流水线（detection + depth）────────────────────────────────────────
+    pipeline_launch = os.path.join(
+        get_package_share_directory("center_depth_pipeline"),
+        "launch", "yolo_center_depth_hp60c.launch.py",
+    )
+
+    # ── base_logger 参数 ───────────────────────────────────────────────────────
+    ws_host                        = LaunchConfiguration("ws_host")
+    ws_port                        = LaunchConfiguration("ws_port")
+    target_class                   = LaunchConfiguration("target_class")
     log_detection_min_interval_sec = LaunchConfiguration("log_detection_min_interval_sec")
-    log_best_detection_only      = LaunchConfiguration("log_best_detection_only")
-    head_ingestion_enabled       = LaunchConfiguration("head_ingestion_enabled")
-    head_http_url                = LaunchConfiguration("head_http_url")
-    head_http_timeout_sec        = LaunchConfiguration("head_http_timeout_sec")
-    head_role                    = LaunchConfiguration("head_role")
-    head_label_prefix            = LaunchConfiguration("head_label_prefix")
+    log_best_detection_only        = LaunchConfiguration("log_best_detection_only")
+    head_ingestion_enabled         = LaunchConfiguration("head_ingestion_enabled")
+    head_http_url                  = LaunchConfiguration("head_http_url")
+    head_http_timeout_sec          = LaunchConfiguration("head_http_timeout_sec")
+    head_role                      = LaunchConfiguration("head_role")
+    head_label_prefix              = LaunchConfiguration("head_label_prefix")
 
     return LaunchDescription([
+        # ── base_logger 参数声明 ───────────────────────────────────────────────
         DeclareLaunchArgument("ws_host",      default_value=str(net.get("ws_host",      "127.0.0.1"))),
         DeclareLaunchArgument("ws_port",      default_value=str(net.get("ws_port",      8765))),
         DeclareLaunchArgument("target_class", default_value=str(log.get("target_class", ""))),
@@ -59,21 +72,28 @@ def generate_launch_description() -> LaunchDescription:
                               default_value=str(net.get("head_http_timeout_sec", 0.25))),
         DeclareLaunchArgument("head_role",         default_value=str(log.get("head_role",         "object"))),
         DeclareLaunchArgument("head_label_prefix", default_value=str(log.get("head_label_prefix", ""))),
+
+        # ── 包含相机流水线（detection_node + depth_node）─────────────────────
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource(pipeline_launch),
+        ),
+
+        # ── base_logger_node ──────────────────────────────────────────────────
         Node(
             package="object_base_logger",
             executable="base_logger_node",
             name="object_base_logger_node",
             parameters=[{
-                "ws_host":                       ws_host,
-                "ws_port":                       ParameterValue(ws_port, value_type=int),
-                "target_class":                  target_class,
+                "ws_host":                        ws_host,
+                "ws_port":                        ParameterValue(ws_port, value_type=int),
+                "target_class":                   target_class,
                 "log_detection_min_interval_sec": ParameterValue(log_detection_min_interval_sec, value_type=float),
-                "log_best_detection_only":       ParameterValue(log_best_detection_only, value_type=bool),
-                "head_ingestion_enabled":        ParameterValue(head_ingestion_enabled, value_type=bool),
-                "head_http_url":                 head_http_url,
-                "head_http_timeout_sec":         ParameterValue(head_http_timeout_sec, value_type=float),
-                "head_role":                     head_role,
-                "head_label_prefix":             head_label_prefix,
+                "log_best_detection_only":        ParameterValue(log_best_detection_only, value_type=bool),
+                "head_ingestion_enabled":         ParameterValue(head_ingestion_enabled, value_type=bool),
+                "head_http_url":                  head_http_url,
+                "head_http_timeout_sec":          ParameterValue(head_http_timeout_sec, value_type=float),
+                "head_role":                      head_role,
+                "head_label_prefix":              head_label_prefix,
             }],
             output="screen",
         ),

@@ -50,25 +50,25 @@ colcon build --symlink-install
 source install/setup.bash
 ```
 
-### 3. 启动 HP60C 相机流水线（终端 1）
-
-```bash
-ros2 launch center_depth_pipeline yolo_center_depth_hp60c.launch.py
-
-# 覆盖参数示例：
-ros2 launch center_depth_pipeline yolo_center_depth_hp60c.launch.py \
-  weights_path:=/absolute/path/to/best.pt \
-  conf_threshold:=0.3
-```
-
-### 4. 启动日志节点（终端 2，独立启动）
+### 3. 一键启动完整流水线
 
 ```bash
 ros2 launch object_base_logger object_base_logger.launch.py
 ```
 
-> 两个 launch 进程互相独立，可任意顺序启动。
-> `object_base_logger` 订阅 `/object_centers_3d`，需要相机流水线运行后才会有数据输出。
+这条命令同时启动：`detection_node` + `depth_node` + `base_logger_node`。
+
+```bash
+# 覆盖参数示例：
+ros2 launch object_base_logger object_base_logger.launch.py \
+  conf_threshold:=0.3 ws_host:=192.168.1.100
+```
+
+### 4. 仅启动相机流水线（不含日志节点）
+
+```bash
+ros2 launch center_depth_pipeline yolo_center_depth_hp60c.launch.py
+```
 
 ### 5. 诊断工具
 

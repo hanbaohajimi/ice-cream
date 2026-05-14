@@ -1,6 +1,23 @@
 from __future__ import annotations
 
+from pathlib import Path
+
 from rclpy.node import Node
+
+
+def read_repo_config() -> dict:
+    """从仓库根 config.yaml 读取全部配置，找不到则返回 {}。"""
+    try:
+        import yaml
+        here = Path(__file__).resolve().parent
+        for _ in range(8):
+            candidate = here / "config.yaml"
+            if candidate.exists():
+                return yaml.safe_load(candidate.read_text(encoding="utf-8")) or {}
+            here = here.parent
+    except Exception:
+        pass
+    return {}
 
 
 def declare_and_get_bool(node: Node, name: str, default: bool) -> bool:

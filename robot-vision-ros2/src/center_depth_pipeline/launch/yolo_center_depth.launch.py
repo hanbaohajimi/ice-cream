@@ -79,7 +79,7 @@ def generate_launch_description() -> LaunchDescription:
             description="角度 EMA 平滑系数（1.0=关闭，0.2=强平滑）",
         ),
         DeclareLaunchArgument(
-            "use_half", default_value="True",
+            "use_half", default_value="true",
             description="在 CUDA 上使用 FP16 推理",
         ),
         DeclareLaunchArgument(

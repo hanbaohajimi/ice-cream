@@ -19,17 +19,16 @@ from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
 
-
+# launch 文件在 install 树中，无法直接 import center_depth_pipeline，
+# 所以在此保留一份轻量的 config 读取逻辑。
 def _read_config() -> dict:
-    """从仓库根 config.yaml 读取全部配置，返回原始 dict。"""
     try:
         import yaml
         here = Path(__file__).resolve().parent
-        for _ in range(6):
+        for _ in range(8):
             candidate = here / "config.yaml"
             if candidate.exists():
-                with open(candidate, encoding="utf-8") as f:
-                    return yaml.safe_load(f) or {}
+                return yaml.safe_load(candidate.read_text(encoding="utf-8")) or {}
             here = here.parent
     except Exception:
         pass
@@ -91,7 +90,7 @@ def generate_launch_description() -> LaunchDescription:
         DeclareLaunchArgument("conf_threshold",       default_value=str(det.get("conf_threshold",         0.25))),
         DeclareLaunchArgument("device",               default_value=str(model.get("device",               "cuda:0"))),
         DeclareLaunchArgument("ema_alpha",            default_value=str(det.get("ema_alpha",              0.4))),
-        DeclareLaunchArgument("use_half",             default_value=str(model.get("use_half",             True))),
+        DeclareLaunchArgument("use_half",             default_value=str(model.get("use_half",             True)).lower()),
         DeclareLaunchArgument("imgsz",                default_value=str(model.get("imgsz",                640))),
         DeclareLaunchArgument("min_stable_frames",    default_value=str(det.get("min_stable_frames",      2))),
         DeclareLaunchArgument("min_depth_m",          default_value=str(depth.get("min_depth_m",          0.05))),

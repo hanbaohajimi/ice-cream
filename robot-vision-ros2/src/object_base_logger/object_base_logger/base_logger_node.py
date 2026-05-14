@@ -15,7 +15,6 @@ import json
 import math
 import threading
 import time
-from pathlib import Path
 from urllib import error as urllib_error
 from urllib import request as urllib_request
 
@@ -23,6 +22,7 @@ import numpy as np
 import rclpy
 import websockets
 from center_depth_msgs.msg import Centers3D
+from center_depth_pipeline.param_utils import read_repo_config
 from rclpy.node import Node
 from rclpy.qos import (
     DurabilityPolicy,
@@ -30,21 +30,6 @@ from rclpy.qos import (
     QoSProfile,
     ReliabilityPolicy,
 )
-
-
-def _read_config() -> dict:
-    """从仓库根 config.yaml 读取全部配置。"""
-    try:
-        import yaml
-        here = Path(__file__).resolve().parent
-        for _ in range(8):
-            candidate = here / "config.yaml"
-            if candidate.exists():
-                return yaml.safe_load(candidate.read_text(encoding="utf-8")) or {}
-            here = here.parent
-    except Exception:
-        pass
-    return {}
 
 
 def _load_T_cam2ee(cfg: dict) -> np.ndarray:
@@ -68,7 +53,7 @@ class ObjectBaseLoggerNode(Node):
     def __init__(self) -> None:
         super().__init__("object_base_logger_node")
 
-        _cfg = _read_config()
+        _cfg = read_repo_config()
         _net = _cfg.get("network", {})
         _log = _cfg.get("logger",  {})
 
@@ -122,7 +107,11 @@ class ObjectBaseLoggerNode(Node):
         self._head_label_prefix = head_label_prefix
         self._frame_seq = 0
 
-        self._T_cam2ee = _load_T_cam2ee(_cfg)
+        try:
+            self._T_cam2ee = _load_T_cam2ee(_cfg)
+        except ValueError as exc:
+            self.get_logger().fatal(str(exc))
+            raise
         self.get_logger().info(
             f"T_cam→ee: config.yaml hand_eye.T_cam2ee  "
             f"|t|={float(np.linalg.norm(self._T_cam2ee[:3, 3]) * 1000):.2f} mm"

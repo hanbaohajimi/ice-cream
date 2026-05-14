@@ -1,6 +1,3 @@
-yolo-pose-pipeline/data_video/
-yolo-pose-pipeline/data_video_frames_merged/
-
 # 训练数据（视频/图片，不入 git）
 yolo-pose-pipeline/data_video/
 yolo-pose-pipeline/data_video_frames_merged/

@@ -28,11 +28,11 @@ source /opt/ros/humble/setup.bash
 colcon build --symlink-install
 source install/setup.bash
 
-# 启动完整流水线（HP60C 相机）
-ros2 launch center_depth_pipeline yolo_center_depth_hp60c.launch.py
-
-# 启动目标位姿记录节点（参数从 config.yaml 读取）
+# 一键启动完整流水线（detection + depth + base_logger）
 ros2 launch object_base_logger object_base_logger.launch.py
+
+# 仅启动相机流水线（不含日志节点）
+ros2 launch center_depth_pipeline yolo_center_depth_hp60c.launch.py
 ```
 
 ### 包结构
@@ -40,7 +40,7 @@ ros2 launch object_base_logger object_base_logger.launch.py
 | 包 | 说明 |
 |----|------|
 | `center_depth_msgs` | 自定义消息：`Centers2D`、`Centers3D`、`DetectionItem` |
-| `center_depth_pipeline` | 核心流水线：检测→深度→可视化→抓取 |
+| `center_depth_pipeline` | 核心流水线：检测→深度 |
 | `object_base_logger` | 订阅 Centers3D，转换到基座坐标并记录/上报 |
 
 ### 节点话题流
@@ -55,12 +55,6 @@ detection_node  ←── /rgb
 
 depth_node      ←── /object_centers_2d + /depth + /camera_info
                 ──► /object_centers_3d  (Centers3D)
-
-visualization_node ←── /rgb + /object_centers_3d
-                   ──► /object_overlay/image
-
-grasp_node      ←── /object_centers_3d
-                ──► /grasp_target       (PoseStamped)
 
 base_logger_node ←── /object_centers_3d + WebSocket(T_ee2base)
                  ──► 控制台日志 / HTTP 上报
