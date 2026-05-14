@@ -9,7 +9,7 @@ setup(
     data_files=[
         ("share/ament_index/resource_index/packages", ["resource/" + package_name]),
         ("share/" + package_name, ["package.xml"]),
-        ("share/" + package_name + "/config", ["config/head_ingestion.yaml"]),
+        ("share/" + package_name + "/launch", ["launch/object_base_logger.launch.py"]),
     ],
     install_requires=["setuptools", "numpy", "websockets"],
     zip_safe=True,

@@ -31,8 +31,8 @@ source install/setup.bash
 # 启动完整流水线（HP60C 相机）
 ros2 launch center_depth_pipeline yolo_center_depth_hp60c.launch.py
 
-# 单独启动目标位姿记录节点
-ros2 run object_base_logger base_logger_node
+# 启动目标位姿记录节点（参数从 config.yaml 读取）
+ros2 launch object_base_logger object_base_logger.launch.py
 ```
 
 ### 包结构

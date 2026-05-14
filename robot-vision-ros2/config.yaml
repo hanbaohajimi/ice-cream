@@ -91,14 +91,6 @@ detection:
   # 来源：detection_node.py ema_alpha（原值 0.4）
   ema_alpha: 0.4
 
-  # 无关键点时是否回退到 bbox 中心作为检测中心
-  # 来源：detection_node.py use_bbox_center_if_no_pose（原值 True）
-  use_bbox_center_if_no_pose: true
-
-  # 用作中心点的关键点索引（0-based，仅 detect 模式有效）
-  # 来源：detection_node.py center_keypoint_index（原值 0）
-  center_keypoint_index: 0
-
   # 是否逐帧打印检测 INFO 日志
   # 来源：detection_node.py log_detections（原值 False；hp60c launch 默认 true）
   log_detections: true

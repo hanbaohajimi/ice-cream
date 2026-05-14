@@ -1,0 +1,80 @@
+"""
+object_base_logger 专用 launch。
+所有参数默认值从仓库根 config.yaml 读取，命令行传参优先级更高。
+"""
+
+import os
+from pathlib import Path
+
+from launch import LaunchDescription
+from launch.actions import DeclareLaunchArgument
+from launch.substitutions import LaunchConfiguration
+from launch_ros.actions import Node
+from launch_ros.parameter_descriptions import ParameterValue
+
+
+def _read_config() -> dict:
+    try:
+        import yaml
+        here = Path(__file__).resolve().parent
+        for _ in range(8):
+            candidate = here / "config.yaml"
+            if candidate.exists():
+                return yaml.safe_load(candidate.read_text(encoding="utf-8")) or {}
+            here = here.parent
+    except Exception:
+        pass
+    return {}
+
+
+def generate_launch_description() -> LaunchDescription:
+    cfg = _read_config()
+    net = cfg.get("network", {})
+    log = cfg.get("logger",  {})
+
+    ws_host                      = LaunchConfiguration("ws_host")
+    ws_port                      = LaunchConfiguration("ws_port")
+    target_class                 = LaunchConfiguration("target_class")
+    log_detection_min_interval_sec = LaunchConfiguration("log_detection_min_interval_sec")
+    log_best_detection_only      = LaunchConfiguration("log_best_detection_only")
+    head_ingestion_enabled       = LaunchConfiguration("head_ingestion_enabled")
+    head_http_url                = LaunchConfiguration("head_http_url")
+    head_http_timeout_sec        = LaunchConfiguration("head_http_timeout_sec")
+    head_role                    = LaunchConfiguration("head_role")
+    head_label_prefix            = LaunchConfiguration("head_label_prefix")
+
+    return LaunchDescription([
+        DeclareLaunchArgument("ws_host",      default_value=str(net.get("ws_host",      "127.0.0.1"))),
+        DeclareLaunchArgument("ws_port",      default_value=str(net.get("ws_port",      8765))),
+        DeclareLaunchArgument("target_class", default_value=str(log.get("target_class", ""))),
+        DeclareLaunchArgument("log_detection_min_interval_sec",
+                              default_value=str(log.get("log_detection_min_interval_sec", 1.0))),
+        DeclareLaunchArgument("log_best_detection_only",
+                              default_value=str(log.get("log_best_detection_only", False)).lower()),
+        DeclareLaunchArgument("head_ingestion_enabled",
+                              default_value=str(log.get("head_ingestion_enabled", False)).lower()),
+        DeclareLaunchArgument("head_http_url",
+                              default_value=str(net.get("head_http_url", ""))),
+        DeclareLaunchArgument("head_http_timeout_sec",
+                              default_value=str(net.get("head_http_timeout_sec", 0.25))),
+        DeclareLaunchArgument("head_role",         default_value=str(log.get("head_role",         "object"))),
+        DeclareLaunchArgument("head_label_prefix", default_value=str(log.get("head_label_prefix", ""))),
+        Node(
+            package="object_base_logger",
+            executable="base_logger_node",
+            name="object_base_logger_node",
+            parameters=[{
+                "ws_host":                       ws_host,
+                "ws_port":                       ParameterValue(ws_port, value_type=int),
+                "target_class":                  target_class,
+                "log_detection_min_interval_sec": ParameterValue(log_detection_min_interval_sec, value_type=float),
+                "log_best_detection_only":       ParameterValue(log_best_detection_only, value_type=bool),
+                "head_ingestion_enabled":        ParameterValue(head_ingestion_enabled, value_type=bool),
+                "head_http_url":                 head_http_url,
+                "head_http_timeout_sec":         ParameterValue(head_http_timeout_sec, value_type=float),
+                "head_role":                     head_role,
+                "head_label_prefix":             head_label_prefix,
+            }],
+            output="screen",
+        ),
+    ])

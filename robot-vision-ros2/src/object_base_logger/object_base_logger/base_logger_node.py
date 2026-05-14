@@ -15,6 +15,7 @@ import json
 import math
 import threading
 import time
+from pathlib import Path
 from urllib import error as urllib_error
 from urllib import request as urllib_request
 
@@ -31,6 +32,21 @@ from rclpy.qos import (
     ReliabilityPolicy,
 )
 
+
+def _read_config() -> dict:
+    """从仓库根 config.yaml 读取全部配置。"""
+    try:
+        import yaml
+        here = Path(__file__).resolve().parent
+        for _ in range(8):
+            candidate = here / "config.yaml"
+            if candidate.exists():
+                return yaml.safe_load(candidate.read_text(encoding="utf-8")) or {}
+            here = here.parent
+    except Exception:
+        pass
+    return {}
+
 _QOS_LATEST = QoSProfile(
     reliability=ReliabilityPolicy.BEST_EFFORT,
     history=HistoryPolicy.KEEP_LAST,
@@ -45,41 +61,45 @@ class ObjectBaseLoggerNode(Node):
     def __init__(self) -> None:
         super().__init__("object_base_logger_node")
 
+        _cfg = _read_config()
+        _net = _cfg.get("network", {})
+        _log = _cfg.get("logger",  {})
+
         centers_3d_topic = self.declare_parameter(
             "centers_3d_topic", "/object_centers_3d"
         ).get_parameter_value().string_value
         target_class = self.declare_parameter(
-            "target_class", ""
+            "target_class", _log.get("target_class", "")
         ).get_parameter_value().string_value.strip()
         log_empty_throttle_sec = self.declare_parameter(
             "log_empty_throttle_sec", 2.0
         ).get_parameter_value().double_value
         ws_host = self.declare_parameter(
-            "ws_host", "127.0.0.1"
+            "ws_host", _net.get("ws_host", "127.0.0.1")
         ).get_parameter_value().string_value
         ws_port = self.declare_parameter(
-            "ws_port", 8765
+            "ws_port", int(_net.get("ws_port", 8765))
         ).get_parameter_value().integer_value
         log_detection_min_interval_sec = self.declare_parameter(
-            "log_detection_min_interval_sec", 1.0
+            "log_detection_min_interval_sec", _log.get("log_detection_min_interval_sec", 1.0)
         ).get_parameter_value().double_value
         log_best_detection_only = self.declare_parameter(
-            "log_best_detection_only", False
+            "log_best_detection_only", bool(_log.get("log_best_detection_only", False))
         ).get_parameter_value().bool_value
         head_ingestion_enabled = self.declare_parameter(
-            "head_ingestion_enabled", False
+            "head_ingestion_enabled", bool(_log.get("head_ingestion_enabled", False))
         ).get_parameter_value().bool_value
         head_http_url = self.declare_parameter(
-            "head_http_url", ""
+            "head_http_url", _net.get("head_http_url", "")
         ).get_parameter_value().string_value.strip()
         head_http_timeout_sec = self.declare_parameter(
-            "head_http_timeout_sec", 0.25
+            "head_http_timeout_sec", _net.get("head_http_timeout_sec", 0.25)
         ).get_parameter_value().double_value
         head_role = self.declare_parameter(
-            "head_role", "object"
+            "head_role", _log.get("head_role", "object")
         ).get_parameter_value().string_value.strip()
         head_label_prefix = self.declare_parameter(
-            "head_label_prefix", ""
+            "head_label_prefix", _log.get("head_label_prefix", "")
         ).get_parameter_value().string_value.strip()
 
         self._target_class = target_class

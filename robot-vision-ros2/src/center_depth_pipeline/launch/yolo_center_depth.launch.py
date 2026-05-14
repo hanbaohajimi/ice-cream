@@ -21,6 +21,7 @@ def generate_launch_description() -> LaunchDescription:
     device            = LaunchConfiguration("device")
     ema_alpha         = LaunchConfiguration("ema_alpha")
     use_half          = LaunchConfiguration("use_half")
+    imgsz             = LaunchConfiguration("imgsz")
     min_stable_frames = LaunchConfiguration("min_stable_frames")
     min_depth_m       = LaunchConfiguration("min_depth_m")
     max_depth_m       = LaunchConfiguration("max_depth_m")
@@ -82,6 +83,10 @@ def generate_launch_description() -> LaunchDescription:
             description="在 CUDA 上使用 FP16 推理",
         ),
         DeclareLaunchArgument(
+            "imgsz", default_value="640",
+            description="推理图像尺寸（像素）",
+        ),
+        DeclareLaunchArgument(
             "min_stable_frames", default_value="2",
             description="发布检测前所需的最少连续帧数",
         ),
@@ -129,6 +134,7 @@ def generate_launch_description() -> LaunchDescription:
                 "device":                   device,
                 "ema_alpha":                ema_alpha,
                 "use_half":                 use_half,
+                "imgsz":                    ParameterValue(imgsz, value_type=int),
                 "min_stable_frames":        ParameterValue(min_stable_frames, value_type=int),
                 "max_det":                  ParameterValue(max_det, value_type=int),
                 "log_detections":           ParameterValue(log_detections, value_type=bool),
