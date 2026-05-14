@@ -44,30 +44,24 @@ network:
 ### 2. 编译工作区
 
 ```bash
-cd robot-vision-ros2
-source /opt/ros/humble/setup.bash
-colcon build --symlink-install
-source install/setup.bash
+bash scripts/build.sh
 ```
 
 ### 3. 一键启动完整流水线
 
 ```bash
-ros2 launch object_base_logger object_base_logger.launch.py
+bash scripts/run.sh
+
+# 覆盖参数示例：
+bash scripts/run.sh conf_threshold:=0.3 ws_host:=192.168.1.100
 ```
 
 这条命令同时启动：`detection_node` + `depth_node` + `base_logger_node`。
 
-```bash
-# 覆盖参数示例：
-ros2 launch object_base_logger object_base_logger.launch.py \
-  conf_threshold:=0.3 ws_host:=192.168.1.100
-```
-
 ### 4. 仅启动相机流水线（不含日志节点）
 
 ```bash
-ros2 launch center_depth_pipeline yolo_center_depth_hp60c.launch.py
+bash scripts/run_pipeline_only.sh
 ```
 
 ### 5. 诊断工具
