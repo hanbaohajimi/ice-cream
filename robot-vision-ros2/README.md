@@ -12,7 +12,6 @@ robot-vision-ros2/
     ├── center_depth_pipeline/     ← 主视觉流水线
     │   ├── detection_node.py      ← YOLO 检测节点
     │   ├── depth_node.py          ← 深度解算节点
-    │   ├── cam_hand_eye.py        ← 手眼外参（从 config.yaml 读取）
     │   └── launch/
     │       ├── yolo_center_depth.launch.py       ← 通用 launch
     │       └── yolo_center_depth_hp60c.launch.py ← HP60C 相机专用 launch
@@ -73,7 +72,7 @@ ros2 run center_depth_pipeline pipeline_doctor
 
 ## 更换手眼标定结果
 
-1. 运行 `handeye-calibration/eyeInHand.py` 得到新的 PARK 方法旋转矩阵和平移向量
+1. 运行 `handeye-calibration/scr/eyeInHand.py` 得到新的 PARK 方法旋转矩阵和平移向量
 2. 将结果填入本仓库 `config.yaml` 的 `hand_eye.T_cam2ee`（4×4 格式）
 3. 重启 ROS2 节点即可生效，**无需重新编译**
 
