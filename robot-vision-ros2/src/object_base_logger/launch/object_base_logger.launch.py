@@ -9,6 +9,7 @@
 import os
 from pathlib import Path
 
+import yaml
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
@@ -20,15 +21,14 @@ from launch_ros.parameter_descriptions import ParameterValue
 
 def _read_config() -> dict:
     try:
-        import yaml
         here = Path(__file__).resolve().parent
-        for _ in range(8):
+        for _ in range(6):
             candidate = here / "config.yaml"
             if candidate.exists():
                 return yaml.safe_load(candidate.read_text(encoding="utf-8")) or {}
             here = here.parent
-    except Exception:
-        pass
+    except Exception as e:
+        print(f"[object_base_logger launch] 读取 config.yaml 失败: {e}")
     return {}
 
 

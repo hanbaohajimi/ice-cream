@@ -95,14 +95,14 @@ class ObjectBaseLoggerNode(Node):
         ).get_parameter_value().string_value.strip()
 
         self._target_class = target_class
-        self._log_empty_throttle_sec = float(log_empty_throttle_sec)
+        self._log_empty_throttle_sec = log_empty_throttle_sec
         self._last_empty_log_time = 0.0
-        self._log_det_min_interval = max(0.0, float(log_detection_min_interval_sec))
-        self._log_best_only = bool(log_best_detection_only)
+        self._log_det_min_interval = max(0.0, log_detection_min_interval_sec)
+        self._log_best_only = log_best_detection_only
         self._last_det_log_time = 0.0
-        self._head_ingestion_enabled = bool(head_ingestion_enabled)
+        self._head_ingestion_enabled = head_ingestion_enabled
         self._head_http_url = self._normalize_head_http_url(head_http_url)
-        self._head_http_timeout = max(0.05, float(head_http_timeout_sec))
+        self._head_http_timeout = max(0.05, head_http_timeout_sec)
         self._head_role = head_role if head_role in {"object", "target", "lid"} else "object"
         self._head_label_prefix = head_label_prefix
         self._frame_seq = 0

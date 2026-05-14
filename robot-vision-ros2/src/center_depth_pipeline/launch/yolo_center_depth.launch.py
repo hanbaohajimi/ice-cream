@@ -6,10 +6,6 @@ from launch_ros.parameter_descriptions import ParameterValue
 
 
 def generate_launch_description() -> LaunchDescription:
-    # ── 话题名称 ────────────────────────────────────────────────────────────────
-    # 默认使用压缩话题（image_transport），节省 Wi-Fi 带宽。
-    # 传入 use_compressed:=false / use_compressed_depth:=false 可回退到
-    # 原始 sensor_msgs/Image 话题。
     rgb_topic         = LaunchConfiguration("rgb_topic")
     depth_topic       = LaunchConfiguration("depth_topic")
     camera_info_topic = LaunchConfiguration("camera_info_topic")
@@ -31,33 +27,26 @@ def generate_launch_description() -> LaunchDescription:
     log_detections          = LaunchConfiguration("log_detections")
     log_empty_throttle_sec  = LaunchConfiguration("log_empty_throttle_sec")
     return LaunchDescription([
-        # ── 话题参数 ──────────────────────────────────────────────────────────
         DeclareLaunchArgument(
-            "rgb_topic",
-            default_value="/ascamera_hp60c/camera_publisher/rgb0/image/compressed",
+            "rgb_topic", default_value="",
             description="RGB 压缩话题（image_transport）；use_compressed=false 时使用原始 Image",
         ),
         DeclareLaunchArgument(
-            "depth_topic",
-            default_value="/ascamera_hp60c/camera_publisher/depth0/image_raw/compressedDepth",
+            "depth_topic", default_value="",
             description="深度 compressedDepth 话题；use_compressed_depth=false 时使用原始 Image",
         ),
         DeclareLaunchArgument(
-            "camera_info_topic",
-            default_value="/ascamera_hp60c/camera_publisher/rgb0/camera_info",
+            "camera_info_topic", default_value="",
             description="RGB camera_info（不压缩，所有模式通用）",
         ),
         DeclareLaunchArgument(
-            "use_compressed",
-            default_value="true",
+            "use_compressed", default_value="true",
             description="RGB 订阅 CompressedImage（true）或原始 Image（false）",
         ),
         DeclareLaunchArgument(
-            "use_compressed_depth",
-            default_value="true",
+            "use_compressed_depth", default_value="true",
             description="深度订阅 compressedDepth（true）或原始 Image（false）",
         ),
-        # ── YOLO / 检测参数 ────────────────────────────────────────────────────
         DeclareLaunchArgument(
             "weights_path", default_value="",
             description="YOLO .pt 权重文件路径",
@@ -90,7 +79,6 @@ def generate_launch_description() -> LaunchDescription:
             "min_stable_frames", default_value="2",
             description="发布检测前所需的最少连续帧数",
         ),
-        # ── 深度参数 ──────────────────────────────────────────────────────────
         DeclareLaunchArgument(
             "sample_radius", default_value="2",
             description="深度中位采样半径（像素）",
@@ -119,7 +107,6 @@ def generate_launch_description() -> LaunchDescription:
             "log_empty_throttle_sec", default_value="2.0",
             description="'Detection: None' 日志的最小间隔秒数（场景为空时）",
         ),
-        # ── 节点 ──────────────────────────────────────────────────────────────
         Node(
             package="center_depth_pipeline",
             executable="detection_node",

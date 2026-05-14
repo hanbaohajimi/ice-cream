@@ -8,8 +8,8 @@ source /opt/ros/humble/setup.bash
 
 cd "$WS"
 colcon build --symlink-install
-source "$WS/install/setup.bash"
 
 echo ""
-echo "编译完成。运行以下命令启动："
+echo "编译完成。在当前终端执行以下命令激活环境，然后再启动节点："
+echo "  source $WS/install/setup.bash"
 echo "  bash $WS/scripts/run.sh"
