@@ -93,6 +93,10 @@ class ObjectBaseLoggerNode(Node):
         head_label_prefix = self.declare_parameter(
             "head_label_prefix", _log.get("head_label_prefix", "")
         ).get_parameter_value().string_value.strip()
+        head_position_z_offset_m = self.declare_parameter(
+            "head_position_z_offset_m",
+            float(_log.get("head_position_z_offset_m", 0.0)),
+        ).get_parameter_value().double_value
 
         self._target_class = target_class
         self._log_empty_throttle_sec = log_empty_throttle_sec
@@ -105,6 +109,7 @@ class ObjectBaseLoggerNode(Node):
         self._head_http_timeout = max(0.05, head_http_timeout_sec)
         self._head_role = head_role if head_role in {"object", "target", "lid"} else "object"
         self._head_label_prefix = head_label_prefix
+        self._head_z_offset_m = float(head_position_z_offset_m)
         self._frame_seq = 0
 
         try:
@@ -136,7 +141,8 @@ class ObjectBaseLoggerNode(Node):
         )
         if self._head_ingestion_enabled and self._head_http_url:
             self.get_logger().info(
-                f"det_logger head ingestion HTTP: {self._head_http_url} role={self._head_role}"
+                f"det_logger head ingestion HTTP: {self._head_http_url} role={self._head_role} "
+                f"head_position_z_offset_m={self._head_z_offset_m:+.4f}"
             )
         else:
             self.get_logger().info("det_logger head ingestion: disabled")
@@ -305,7 +311,13 @@ class ObjectBaseLoggerNode(Node):
                 if base_xyz is not None:
                     bx, by, bz = base_xyz
                     head_objects.append(
-                        self._build_head_object(idx, cls, score, base_xyz, angle_deg)
+                        self._build_head_object(
+                            idx,
+                            cls,
+                            score,
+                            (bx, by, bz + self._head_z_offset_m),
+                            angle_deg,
+                        )
                     )
                     base_txt = (
                         f" base_xyz_m=({bx:+.4f},{by:+.4f},{bz:+.4f})"

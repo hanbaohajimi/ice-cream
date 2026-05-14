@@ -54,6 +54,7 @@ def generate_launch_description() -> LaunchDescription:
     head_http_timeout_sec          = LaunchConfiguration("head_http_timeout_sec")
     head_role                      = LaunchConfiguration("head_role")
     head_label_prefix              = LaunchConfiguration("head_label_prefix")
+    head_position_z_offset_m       = LaunchConfiguration("head_position_z_offset_m")
 
     return LaunchDescription([
         # ── base_logger 参数声明 ───────────────────────────────────────────────
@@ -72,6 +73,10 @@ def generate_launch_description() -> LaunchDescription:
                               default_value=str(net.get("head_http_timeout_sec", 0.25))),
         DeclareLaunchArgument("head_role",         default_value=str(log.get("head_role",         "object"))),
         DeclareLaunchArgument("head_label_prefix", default_value=str(log.get("head_label_prefix", ""))),
+        DeclareLaunchArgument(
+            "head_position_z_offset_m",
+            default_value=str(log.get("head_position_z_offset_m", 0.0)),
+        ),
 
         # ── 包含相机流水线（detection_node + depth_node）─────────────────────
         IncludeLaunchDescription(
@@ -94,6 +99,7 @@ def generate_launch_description() -> LaunchDescription:
                 "head_http_timeout_sec":          ParameterValue(head_http_timeout_sec, value_type=float),
                 "head_role":                      head_role,
                 "head_label_prefix":              head_label_prefix,
+                "head_position_z_offset_m":       ParameterValue(head_position_z_offset_m, value_type=float),
             }],
             output="screen",
         ),
