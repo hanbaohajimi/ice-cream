@@ -93,7 +93,7 @@ detection:
 
   # 是否逐帧打印检测 INFO 日志
   # 来源：detection_node.py log_detections（原值 False；hp60c launch 默认 true）
-  log_detections: true
+  log_detections: false
 
   # "无检测"日志节流间隔（秒）
   # 来源：detection_node.py log_empty_throttle_sec（原值 2.0）
@@ -121,7 +121,7 @@ depth:
 
   # 有效深度最大值（米），大于此值视为超范围
   # 来源：depth_node.py max_depth_m（原值 4.0）
-  max_depth_m: 4.0
+  max_depth_m: 3.0
 
 
 # ── 网络地址（base_logger_node.py / head_ingestion.yaml）──────────────────────
@@ -161,7 +161,7 @@ logger:
 
   # 是否启用 HTTP 上报到 Head 设备
   # 来源：base_logger_node.py head_ingestion_enabled（原值 False）
-  head_ingestion_enabled: false
+  head_ingestion_enabled: true
 
   # 上报时附带的语义角色标签
   # 来源：base_logger_node.py head_role（原值 "object"）
@@ -170,3 +170,6 @@ logger:
   # 上报类别名称时添加的前缀（如 "robot_" → "robot_Triangle"）
   # 来源：base_logger_node.py head_label_prefix（原值 ""）
   head_label_prefix: ""
+
+  # 仅作用于发往 Head 的 HTTP：position.z 在基座坐标 z 上再加此偏移（米）；控制台 det-log 仍为原始 z
+  head_position_z_offset_m: 0.1
