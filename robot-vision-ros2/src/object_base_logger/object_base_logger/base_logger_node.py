@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Realtime console logger: Centers3D + code T_cam→ee + Pi WebSocket → base xyz.
+"""Realtime console logger: Centers3D + T_cam→ee + Pi WebSocket → base xyz.
 
-与 center_depth_pipeline.cam_hand_eye 约定一致::
+变换链::
   - Pi ``feedback.link5_hmat`` = :math:`T_{ee→base}`（4×4）
-  - ``get_T_cam2ee()``：相机坐标系 → 末端执行器坐标系
+  - T_cam2ee 从仓库根 config.yaml hand_eye.T_cam2ee 读取
   - 相机系点 :math:`p_{cam}`（Centers3D 的 x,y,z）
   - :math:`p_{base} = T_{ee2base} T_{cam2ee} p_{cam}`
 """
@@ -23,7 +23,6 @@ import numpy as np
 import rclpy
 import websockets
 from center_depth_msgs.msg import Centers3D
-from center_depth_pipeline.cam_hand_eye import get_T_cam2ee
 from rclpy.node import Node
 from rclpy.qos import (
     DurabilityPolicy,
@@ -46,6 +45,14 @@ def _read_config() -> dict:
     except Exception:
         pass
     return {}
+
+
+def _load_T_cam2ee(cfg: dict) -> np.ndarray:
+    """从 config hand_eye.T_cam2ee 读取 4×4 矩阵；格式不对则抛出 ValueError。"""
+    rows = cfg.get("hand_eye", {}).get("T_cam2ee")
+    if rows and len(rows) == 4 and all(len(r) == 4 for r in rows):
+        return np.array(rows, dtype=np.float64)
+    raise ValueError("config.yaml hand_eye.T_cam2ee 缺失或格式错误（需要 4×4 矩阵）")
 
 _QOS_LATEST = QoSProfile(
     reliability=ReliabilityPolicy.BEST_EFFORT,
@@ -115,9 +122,9 @@ class ObjectBaseLoggerNode(Node):
         self._head_label_prefix = head_label_prefix
         self._frame_seq = 0
 
-        self._T_cam2ee = get_T_cam2ee()
+        self._T_cam2ee = _load_T_cam2ee(_cfg)
         self.get_logger().info(
-            "T_cam→ee: center_depth_pipeline.cam_hand_eye（代码内常量，不从 YAML 读取） "
+            f"T_cam→ee: config.yaml hand_eye.T_cam2ee  "
             f"|t|={float(np.linalg.norm(self._T_cam2ee[:3, 3]) * 1000):.2f} mm"
         )
 
