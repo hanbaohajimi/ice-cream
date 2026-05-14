@@ -67,8 +67,8 @@ ros2 launch center_depth_pipeline yolo_center_depth_hp60c.launch.py \
 ros2 launch object_base_logger object_base_logger.launch.py
 ```
 
-> 两个 launch 相互独立，可任意顺序启动，也可单独运行。
-> `object_base_logger` 仅订阅 `/object_centers_3d` 话题，等待相机流水线发布数据即可。
+> 两个 launch 进程互相独立，可任意顺序启动。
+> `object_base_logger` 订阅 `/object_centers_3d`，需要相机流水线运行后才会有数据输出。
 
 ### 5. 诊断工具
 
