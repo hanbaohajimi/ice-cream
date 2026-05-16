@@ -52,7 +52,6 @@ def generate_launch_description() -> LaunchDescription:
     head_ingestion_enabled         = LaunchConfiguration("head_ingestion_enabled")
     head_http_url                  = LaunchConfiguration("head_http_url")
     head_http_timeout_sec          = LaunchConfiguration("head_http_timeout_sec")
-    head_role                      = LaunchConfiguration("head_role")
     head_label_prefix              = LaunchConfiguration("head_label_prefix")
     head_position_z_offset_m       = LaunchConfiguration("head_position_z_offset_m")
 
@@ -71,7 +70,6 @@ def generate_launch_description() -> LaunchDescription:
                               default_value=str(net.get("head_http_url", ""))),
         DeclareLaunchArgument("head_http_timeout_sec",
                               default_value=str(net.get("head_http_timeout_sec", 0.25))),
-        DeclareLaunchArgument("head_role",         default_value=str(log.get("head_role",         "object"))),
         DeclareLaunchArgument("head_label_prefix", default_value=str(log.get("head_label_prefix", ""))),
         DeclareLaunchArgument(
             "head_position_z_offset_m",
@@ -97,7 +95,6 @@ def generate_launch_description() -> LaunchDescription:
                 "head_ingestion_enabled":         ParameterValue(head_ingestion_enabled, value_type=bool),
                 "head_http_url":                  head_http_url,
                 "head_http_timeout_sec":          ParameterValue(head_http_timeout_sec, value_type=float),
-                "head_role":                      head_role,
                 "head_label_prefix":              head_label_prefix,
                 "head_position_z_offset_m":       ParameterValue(head_position_z_offset_m, value_type=float),
             }],

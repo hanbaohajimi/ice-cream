@@ -163,9 +163,22 @@ logger:
   # 来源：base_logger_node.py head_ingestion_enabled（原值 False）
   head_ingestion_enabled: true
 
-  # 上报时附带的语义角色标签
-  # 来源：base_logger_node.py head_role（原值 "object"）
-  head_role: "object"
+  # 按类别名映射上报角色（object / target / lid），未列出的类别默认为 object
+  head_role_map:
+    Triangle:                   object
+    Circle:                     object
+    Trapezium:                  object
+    Square:                     object
+    Triangle_Pedestal_Red:      target
+    Triangle_Pedestal_Blue:     target
+    Circle_Pedestal_Red:        target
+    Circle_Pedestal_Blue:       target
+    Trapezium_Pedestal_Red:     target
+    Trapezium_Pedestal_Blue:    target
+    Square_Pedestal_Red:        target
+    Square_Pedestal_Blue:       target
+    Trapezium_Cover:            lid
+    Triangle_Cover:             lid
 
   # 上报类别名称时添加的前缀（如 "robot_" → "robot_Triangle"）
   # 来源：base_logger_node.py head_label_prefix（原值 ""）

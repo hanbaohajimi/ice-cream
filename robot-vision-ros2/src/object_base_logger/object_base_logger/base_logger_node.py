@@ -87,9 +87,6 @@ class ObjectBaseLoggerNode(Node):
         head_http_timeout_sec = self.declare_parameter(
             "head_http_timeout_sec", _net.get("head_http_timeout_sec", 0.25)
         ).get_parameter_value().double_value
-        head_role = self.declare_parameter(
-            "head_role", _log.get("head_role", "object")
-        ).get_parameter_value().string_value.strip()
         head_label_prefix = self.declare_parameter(
             "head_label_prefix", _log.get("head_label_prefix", "")
         ).get_parameter_value().string_value.strip()
@@ -107,7 +104,10 @@ class ObjectBaseLoggerNode(Node):
         self._head_ingestion_enabled = head_ingestion_enabled
         self._head_http_url = self._normalize_head_http_url(head_http_url)
         self._head_http_timeout = max(0.05, head_http_timeout_sec)
-        self._head_role = head_role if head_role in {"object", "target", "lid"} else "object"
+        self._head_role_map: dict[str, str] = {
+            k: v for k, v in _log.get("head_role_map", {}).items()
+            if v in {"object", "target", "lid"}
+        }
         self._head_label_prefix = head_label_prefix
         self._head_z_offset_m = head_position_z_offset_m
         self._frame_seq = 0
@@ -141,7 +141,7 @@ class ObjectBaseLoggerNode(Node):
         )
         if self._head_ingestion_enabled and self._head_http_url:
             self.get_logger().info(
-                f"det_logger head ingestion HTTP: {self._head_http_url} role={self._head_role} "
+                f"det_logger head ingestion HTTP: {self._head_http_url} "
                 f"head_position_z_offset_m={self._head_z_offset_m:+.4f}"
             )
         else:
@@ -245,10 +245,11 @@ class ObjectBaseLoggerNode(Node):
         angle_deg: float,
     ) -> dict[str, object]:
         label = f"{self._head_label_prefix}{cls}" if cls else f"{self._head_label_prefix}object"
+        role = self._head_role_map.get(cls, "object")
         bx, by, bz = base_xyz
         return {
-            "role": self._head_role,
-            "track_id": f"{self._head_role}:{cls or 'object'}:{idx}",
+            "role": role,
+            "track_id": f"{role}:{cls or 'object'}:{idx}",
             "class_id": cls or idx,
             "label": label,
             "confidence": score,
