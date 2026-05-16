@@ -103,9 +103,7 @@ class DetectionItem(NamedTuple):
 
 _NO_ORIENT_CLASSES = {"circle"}
 
-_RECT_ALIASES = {"square"}
 _CLASS_ALIASES = {
-    "square":                  "square",
     "trapezoid":               "trapezium",
     # 派生类别（底座/盖子）→ 基础形状，复用相同的关键点几何逻辑
     "triangle_pedestal_red":   "triangle",
@@ -221,7 +219,7 @@ def _default_roles_for_class(cls_key: str, n_kpts: int) -> Dict[str, int]:
             "long_base_right": 2,
             "long_base_left": 3,
         }
-    if cls_key in _RECT_ALIASES and n_kpts >= 4:
+    if cls_key == "square" and n_kpts >= 4:
         return {
             "front_left": 0,
             "front_right": 1,
@@ -318,7 +316,7 @@ def _required_role_indices(cls_key: str, roles: Dict[str, int], n_kpts: int) -> 
             "long_base_right",
             "long_base_left",
         ]
-    elif cls_key in _RECT_ALIASES:
+    elif cls_key == "square":
         required = ["front_left", "front_right", "back_right", "back_left"]
     else:
         return None
@@ -462,7 +460,7 @@ def _angle_from_kpts(
             return ang
         return None
 
-    if cls_l in _RECT_ALIASES and n >= 4:
+    if cls_l == "square" and n >= 4:
         required = _required_role_indices(cls_l, roles, n)
         if required is None:
             return None
@@ -731,7 +729,7 @@ class DetectionNode(Node):
                 # EMA 作用于原始 [-90°,90°]。对矩形，折叠到 [-45°,45°] 在 EMA 之后执行，
                 # 这样平滑信号在越过 ±45° 边界时会平缓过渡，无需额外状态即实现隐式迟滞。
                 angle_rad = self._smooth_angle(label, angle_rad)
-                if _canonical_class_key(label) in _RECT_ALIASES:
+                if _canonical_class_key(label) == "square":
                     if angle_rad > math.pi / 4.0:
                         angle_rad -= math.pi / 2.0
                     elif angle_rad < -math.pi / 4.0:
