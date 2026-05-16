@@ -35,8 +35,8 @@
                      EMA 后折叠到 [-45°,45°]（4 重对称）
               质心 = 四角几何均值 = 正方形中心
 
-类别名称别名（dataset421 将 Rectangle 重命名为 Square）：
-  "square" 在所有几何逻辑中与 "rectangle" 完全等价。
+类别名称别名：
+  "trapezoid" 与 "trapezium" 完全等价。
 """
 
 from __future__ import annotations
@@ -103,11 +103,8 @@ class DetectionItem(NamedTuple):
 
 _NO_ORIENT_CLASSES = {"circle"}
 
-# dataset421 将 "Rectangle" 重命名为 "Square"。两者在所有几何逻辑中完全等价，
-# 同一流水线可兼容 dataset417 和 dataset421 的权重。
-_RECT_ALIASES = {"rectangle", "square"}
+_RECT_ALIASES = {"square"}
 _CLASS_ALIASES = {
-    "rectangle":               "square",
     "square":                  "square",
     "trapezoid":               "trapezium",
     # 派生类别（底座/盖子）→ 基础形状，复用相同的关键点几何逻辑
@@ -261,8 +258,6 @@ def _load_pose_class_specs(path: Optional[Path]) -> Dict[str, dict]:
             "roles": role_map,
         }
         specs[cls_key] = spec
-        if cls_key == "square":
-            specs["rectangle"] = spec
     return specs
 
 

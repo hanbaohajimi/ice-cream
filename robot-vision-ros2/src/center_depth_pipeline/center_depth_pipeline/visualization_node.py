@@ -66,8 +66,6 @@ _CLASS_COLOR: dict = {
     "triangle":  (0,   165, 255),
     "circle":    (255,   0, 255),
     "trapezium": (0,   255, 255),
-    "rectangle": (255, 220,   0),
-    # dataset421 将 Rectangle 重命名为 Square；保持相同视觉样式
     "square":    (255, 220,   0),
 }
 _DEFAULT_COLOR: Tuple[int, int, int] = (0, 255, 255)
@@ -77,7 +75,6 @@ _SKELETON: dict = {
     "triangle":  [(0, 1), (1, 2), (2, 0)],
     "circle":    [],
     "trapezium": [(0, 1), (1, 2), (2, 3), (3, 0)],
-    "rectangle": [(0, 1), (1, 2), (2, 3), (3, 0)],
     "square":    [(0, 1), (1, 2), (2, 3), (3, 0)],
 }
 _KPT_COLORS: List[Tuple[int, int, int]] = [
