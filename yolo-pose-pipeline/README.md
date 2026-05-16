@@ -9,13 +9,14 @@ yolo-pose-pipeline/
 ├── config.yaml                  ← 所有参数在此配置，有详细注释
 ├── data_video/                  ← 放入原始视频（不入库）
 ├── data_video_frames/           ← 抽帧输出目录（自动生成，不入库）
-├── dataset/                     ← 原始标注数据（images/ + labels/）
-├── yolo_dataset/                ← 生成的 YOLO 格式数据集（可重建，不入库）
-├── data.yaml                    ← YOLO 数据集配置（指向 yolo_dataset/）
+├── dataset/                     ← 数据集目录，每个子目录为一个数据集
+│   └── data516/
+│       ├── images/              ← 平铺图片，分割后自动生成 train/val/test 子目录
+│       └── labels/              ← 平铺 YOLO txt，分割后自动生成 train/val/test 子目录
 ├── runs/                        ← 训练输出（权重文件）
 └── src/
     ├── extract_frames.py        ← 从视频批量抽帧
-    ├── prepare_data.py          ← LabelMe JSON → YOLO txt + train/val/test 分割
+    ├── prepare_data.py          ← 原地分割 dataset 为 train/val/test
     ├── train.py                 ← 训练 YOLO pose 模型
     └── realtime_detect_pose.py  ← 摄像头实时推理
 ```
@@ -34,9 +35,9 @@ pip install -r src/requirements.txt
 
 ```yaml
 prepare_data:
-  src_dir: "dataset"
-  pose_classes_file: "dataset/pose_classes.yaml"
+  src_dir: "dataset/data516"   # 要分割的数据集目录
   train_ratio: 0.8
+  val_ratio: 0.1
 
 train:
   epochs: 100
@@ -52,18 +53,17 @@ python3 src/extract_frames.py
 # 输出到 data_video_frames/，每个视频一个子目录
 ```
 
-### 3. 准备数据集
+### 3. 原地分割数据集
 
 ```bash
-# 模式1：LabelMe JSON → YOLO txt + 分割（默认）
+# 使用 config.yaml 中 prepare_data.src_dir 指定的数据集
 python3 src/prepare_data.py
 
-# 模式2：已有 YOLO txt，只做 train/val/test 分割
-python3 src/prepare_data.py --mode split-only
-
-# 可选 CLI 覆盖：
-python3 src/prepare_data.py --src my_dataset --dst yolo_my --train 0.85 --val 0.1
+# 或指定具体数据集目录
+python3 src/prepare_data.py --dataset dataset/data516 --train 0.8 --val 0.1
 ```
+
+分割后 `images/` 和 `labels/` 下的平铺文件会直接移动到对应的 `train/val/test` 子目录，无需额外目录。
 
 ### 4. 训练
 

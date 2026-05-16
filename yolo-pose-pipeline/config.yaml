@@ -29,39 +29,17 @@ extract_frames:
 # ── 数据集准备 (src/prepare_data.py) ─────────────────────────────────────────
 prepare_data:
 
-  # 源数据集根目录（含 images/ 和 labels/ 子目录，或 images/ 下有 LabelMe JSON）
-  # 来源：prepare_data.py --src（原值 SCRIPT_DIR/"dataset2"）
-  src_dir: "dataset"
-
-  # 输出 YOLO 格式数据集根目录（train/val/test 分割结果写入此处）
-  # 来源：prepare_data.py --dst（原值 SCRIPT_DIR/"yolo_dataset"）
-  dst_dir: "yolo_dataset"
-
-  # 类别定义文件（pose_classes.yaml，定义各类别的关键点名称与顺序）
-  # 来源：prepare_data.py POSE_CLASS_FILE（原值 SCRIPT_DIR/"dataset417/pose_classes.yaml"）
-  pose_classes_file: "dataset/pose_classes.yaml"
-
-  # 每个目标最大关键点数量，不足时补 0（不可见）
-  # 来源：prepare_data.py line 12 MAX_KPTS（原值 4）
-  max_keypoints: 4
+  # 要分割的数据集目录（含平铺的 images/ 和 labels/），原地分割，不产生新目录
+  src_dir: "dataset/data516"
 
   # 训练集比例（0~1）
-  # 来源：prepare_data.py train_ratio（原值 0.8）
   train_ratio: 0.8
 
   # 验证集比例（0~1），剩余部分自动作为测试集
-  # 来源：prepare_data.py val_ratio（原值 0.1）
   val_ratio: 0.1
 
   # 随机种子，保证每次划分结果可复现
-  # 来源：prepare_data.py seed（原值 42）
   seed: 42
-
-  # 运行模式：
-  #   convert    - LabelMe JSON → YOLO txt，然后做 train/val/test 分割（默认）
-  #   split-only - 跳过 JSON 转换，直接对已有 YOLO txt 做分割（原 split_only.py 功能）
-  # 来源：split_only.py 已合并至此脚本
-  mode: "convert"
 
 
 # ── 模型训练 (src/train.py) ───────────────────────────────────────────────────
