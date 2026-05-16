@@ -65,16 +65,16 @@ python eyeInHand.py
 cd yolo-pose-pipeline
 
 # 从视频抽帧（约 2fps）
-python pose/src/extract_frames.py
+python src/extract_frames.py
 
 # LabelMe JSON → YOLO Pose txt + 数据集划分
-python pose/src/prepare_data.py
+python src/prepare_data.py
 
 # 训练（从 yolo11n-pose.pt 预训练权重开始）
-python pose/src/train_pose.py
+python src/train.py
 
 # 实时验证（摄像头直接推流）
-python pose/src/realtime_detect_pose.py
+python src/realtime_detect_pose.py
 ```
 
 训练完成后更新 `robot-vision-ros2/config.yaml` 中的 `model.weights_path` 和 `model.pose_classes_path`。

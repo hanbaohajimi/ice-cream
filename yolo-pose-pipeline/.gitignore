@@ -1,12 +1,15 @@
 # 生成的 YOLO 数据集（由 prepare_data.py 生成，可随时重建）
-pose/yolo_dataset*/
+yolo_dataset*/
 data_video_frames/
 
-# 训练输出（模型较大，可考虑 git-lfs 管理）
-# pose/runs/
+# 数据集图片与标注（大量文件，不入库）
+dataset/
+
+# 训练输出（模型较大）
+runs/
 
 # 原始视频（建议存外部存储）
-# data_video/
+data_video/
 
 # Python 缓存
 __pycache__/
