@@ -90,11 +90,11 @@ python eyeInHand.py   # 输出 T_cam2ee，填入 config.yaml hand_eye.T_cam2ee
 ```bash
 cd yolo-pose-pipeline
 # 数据集准备
-python merge_datasets.py
+python src/prepare_data.py
 # 训练
-python train_pose.py
-# 输出：pose/runs/<dataset>/weights/best.pt
-#       <dataset>/pose_classes.yaml
+python src/train.py
+# 输出：runs/<dataset>/weights/best.pt
+#       dataset/yolo_dataset54_421_merged/pose_classes.yaml
 ```
 
 训练完成后更新 `robot-vision-ros2/config.yaml` 中的 `model.weights_path` 和 `model.pose_classes_path`。

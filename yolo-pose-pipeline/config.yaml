@@ -26,20 +26,20 @@ extract_frames:
   ext: ".jpg"
 
 
-# ── 数据集准备 (pose/prepare_data.py) ────────────────────────────────────────
+# ── 数据集准备 (src/prepare_data.py) ─────────────────────────────────────────
 prepare_data:
 
   # 源数据集根目录（含 images/ 和 labels/ 子目录，或 images/ 下有 LabelMe JSON）
   # 来源：prepare_data.py --src（原值 SCRIPT_DIR/"dataset2"）
-  src_dir: "pose/dataset"
+  src_dir: "dataset"
 
   # 输出 YOLO 格式数据集根目录（train/val/test 分割结果写入此处）
   # 来源：prepare_data.py --dst（原值 SCRIPT_DIR/"yolo_dataset"）
-  dst_dir: "pose/yolo_dataset"
+  dst_dir: "yolo_dataset"
 
   # 类别定义文件（pose_classes.yaml，定义各类别的关键点名称与顺序）
   # 来源：prepare_data.py POSE_CLASS_FILE（原值 SCRIPT_DIR/"dataset417/pose_classes.yaml"）
-  pose_classes_file: "pose/dataset/pose_classes.yaml"
+  pose_classes_file: "dataset/pose_classes.yaml"
 
   # 每个目标最大关键点数量，不足时补 0（不可见）
   # 来源：prepare_data.py line 12 MAX_KPTS（原值 4）
@@ -64,7 +64,7 @@ prepare_data:
   mode: "convert"
 
 
-# ── 模型训练 (pose/train.py) ──────────────────────────────────────────────────
+# ── 模型训练 (src/train.py) ───────────────────────────────────────────────────
 train:
 
   # Ultralytics 预训练基础权重文件名（首次运行自动下载）
@@ -73,7 +73,7 @@ train:
 
   # 数据集配置文件路径（相对于本 config.yaml 所在目录）
   # 来源：train.py data=ROOT/"data.yaml"
-  data_yaml: "pose/data.yaml"
+  data_yaml: "data.yaml"
 
   # 训练轮数
   # 来源：train.py epochs（原值 100）
@@ -93,15 +93,15 @@ train:
 
   # 训练输出根目录（相对于本 config.yaml 所在目录）
   # 来源：train.py project=ROOT/"runs"
-  runs_dir: "pose/runs"
+  runs_dir: "runs"
 
 
-# ── 实时推理 (pose/realtime_detect_pose.py) ───────────────────────────────────
+# ── 实时推理 (src/realtime_detect_pose.py) ────────────────────────────────────
 inference:
 
   # 训练好的模型权重路径（相对于本 config.yaml 所在目录）
   # 来源：realtime_detect_pose.py --weights（原为 required 参数，现有默认值）
-  weights_path: "pose/runs/pose_training/weights/best.pt"
+  weights_path: "runs/pose_training/weights/best.pt"
 
   # 摄像头设备索引（0 = 第一个摄像头）
   # 来源：realtime_detect_pose.py --source（原值 0）

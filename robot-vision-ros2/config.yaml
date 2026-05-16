@@ -53,11 +53,11 @@ model:
 
   # YOLO 权重文件路径（相对于本 config.yaml 所在目录，或绝对路径）
   # 来源：yolo_center_depth_hp60c.launch.py weights_path（原绝对路径 /home/ubuntu22/...）
-  weights_path: "/home/ubuntu22/robot_projects/yolo-pose-pipeline/pose/runs/dataset54/weights/best.pt"
+  weights_path: "/home/ubuntu22/robot_projects/yolo-pose-pipeline/runs/dataset54/weights/best.pt"
 
   # 关键点类别定义文件（pose_classes.yaml）
   # 来源：yolo_center_depth_hp60c.launch.py pose_classes_path（原绝对路径 /home/ubuntu22/...）
-  pose_classes_path: "/home/ubuntu22/robot_projects/yolo-pose-pipeline/yolo_dataset54_421_merged/pose_classes.yaml"
+  pose_classes_path: "/home/ubuntu22/robot_projects/yolo-pose-pipeline/dataset/yolo_dataset54_421_merged/pose_classes.yaml"
 
   # 推理设备（"cuda:0" / "cpu"）
   # 来源：detection_node.py device（原值 "cuda:0"）
