@@ -1,7 +1,3 @@
-# 生成的 YOLO 数据集（由 prepare_data.py 生成，可随时重建）
-yolo_dataset*/
-data_video_frames/
-
 # 数据集图片与标注（大量文件，不入库）
 dataset/
 
