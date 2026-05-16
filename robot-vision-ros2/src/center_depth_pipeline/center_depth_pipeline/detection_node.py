@@ -101,7 +101,7 @@ class DetectionItem(NamedTuple):
     kpts_v: object = None   # np.ndarray (K,)  or None
 
 
-_NO_ORIENT_CLASSES = {"circle"}
+
 
 _CLASS_ALIASES = {
     "trapezoid":               "trapezium",
@@ -407,7 +407,7 @@ def _center_from_kpts(
     spec = _spec_for_class(pose_specs, cls_name)
     roles = spec.get("roles", {})
 
-    if cls_l in _NO_ORIENT_CLASSES:
+    if cls_l == "circle":
         indices = _required_role_indices(cls_l, roles, n)
         if indices is None:
             return None
@@ -439,7 +439,7 @@ def _angle_from_kpts(
     kps_xy: np.ndarray, kps_v: np.ndarray, cls_name: str, pose_specs: Dict[str, dict]
 ) -> Optional[float]:
     cls_l = _canonical_class_key(cls_name)
-    if cls_l in _NO_ORIENT_CLASSES:
+    if cls_l == "circle":
         return 0.0
     n = int(kps_xy.shape[0])
     spec = _spec_for_class(pose_specs, cls_name)
@@ -726,7 +726,7 @@ class DetectionNode(Node):
                 if center is None or angle_rad is None:
                     continue
                 cx_f, cy_f = center
-                # EMA 作用于原始 [-90°,90°]。对矩形，折叠到 [-45°,45°] 在 EMA 之后执行，
+                # EMA 作用于原始 [-90°,90°]。对正方形，折叠到 [-45°,45°] 在 EMA 之后执行，
                 # 这样平滑信号在越过 ±45° 边界时会平缓过渡，无需额外状态即实现隐式迟滞。
                 angle_rad = self._smooth_angle(label, angle_rad)
                 if _canonical_class_key(label) == "square":
