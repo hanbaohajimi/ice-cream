@@ -109,7 +109,7 @@ class ObjectBaseLoggerNode(Node):
         self._head_http_timeout = max(0.05, head_http_timeout_sec)
         self._head_role = head_role if head_role in {"object", "target", "lid"} else "object"
         self._head_label_prefix = head_label_prefix
-        self._head_z_offset_m = float(head_position_z_offset_m)
+        self._head_z_offset_m = head_position_z_offset_m
         self._frame_seq = 0
 
         try:

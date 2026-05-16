@@ -72,7 +72,7 @@ ros2 run center_depth_pipeline pipeline_doctor
 
 ## 更换手眼标定结果
 
-1. 运行 `handeye-calibration/scr/eyeInHand.py` 得到新的 PARK 方法旋转矩阵和平移向量
+1. 运行 `handeye-calibration/src/eyeInHand.py` 得到新的 PARK 方法旋转矩阵和平移向量
 2. 将结果填入本仓库 `config.yaml` 的 `hand_eye.T_cam2ee`（4×4 格式）
 3. 重启 ROS2 节点即可生效，**无需重新编译**
 
